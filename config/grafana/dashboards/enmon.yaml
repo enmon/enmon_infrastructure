@@ -1,0 +1,11 @@
+apiVersion: 1
+
+providers:
+  - name: 'enmon-provider'
+    folder: ''
+    type: file
+    disableDeletion: true
+    updateIntervalSeconds: 300
+    allowUiUpdates: true
+    options:
+      path: /etc/grafana/provisioning/dashboards

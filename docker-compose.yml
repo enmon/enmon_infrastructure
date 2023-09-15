@@ -1,0 +1,88 @@
+version: '3.3'
+services:
+    # mosquitto MQTT broker
+    mqtt-broker:
+        image: eclipse-mosquitto:2.0.15
+        ports:
+            # expose MQTT over host 1883
+            - '1883:1883'
+        volumes:
+            - type: bind
+              source: ./config/mosquitto.conf
+              target: /mosquitto/config/mosquitto.conf
+              read_only: true
+
+
+    # subscribes to MQTT energy monitor info messages,
+    # provides weather informations at plant latitude/longitude
+    weather-provider:
+        image: rwrr0644/enmon_weather_provider:v1.4-alpine
+        environment:
+            - OWM_API_KEY
+            - MQTT_BROKER=mqtt-broker
+
+
+    # InfluxDB handles power generation time series storage
+    influxdb:
+        image: influxdb:2.7.1-alpine
+
+        volumes:
+            - influxdb-data:/var/lib/influxdb2
+            - influxdb-config:/etc/influxdb2
+
+        environment:
+            # preconfigure InfluxDB database
+            - DOCKER_INFLUXDB_INIT_MODE=setup
+            - DOCKER_INFLUXDB_INIT_USERNAME=${INFLUXDB_USERNAME}
+            - DOCKER_INFLUXDB_INIT_PASSWORD=${INFLUXDB_PASSWORD}
+            - DOCKER_INFLUXDB_INIT_ADMIN_TOKEN=${INFLUXDB_ADMIN_TOKEN}
+            - DOCKER_INFLUXDB_INIT_ORG=enmon
+            - DOCKER_INFLUXDB_INIT_BUCKET=enmon
+
+
+    # subscribes to MQTT energy monitor status messages,
+    # saves messages to InfluxDB
+    persistence-provider:
+        image: telegraf:1.27.3-alpine
+
+        volumes:
+            # preconfigure MQTT, InfluxDB plugins
+            - type: bind
+              source: ./config/telegraf.conf
+              target: /etc/telegraf/telegraf.conf
+              read_only: true
+
+        environment:
+            - INFLUXDB_TOKEN=${INFLUXDB_ADMIN_TOKEN}
+
+
+    # Grafana can be used to view statistical informations about
+    # current / past power generation data
+    grafana:
+        image: grafana/grafana-oss:10.1.0
+        volumes:
+            # grafana configuration persistence
+            - grafana:/var/lib/grafana
+
+            # automatically provision datasource and provider
+            - type: bind
+              source: ./config/grafana/datasources/
+              target: /etc/grafana/provisioning/datasources/
+              read_only: true
+            - type: bind
+              source: ./config/grafana/dashboards/
+              target: /etc/grafana/provisioning/dashboards/
+              read_only: true
+
+        environment:
+            - INFLUXDB_TOKEN=${INFLUXDB_ADMIN_TOKEN}
+
+        ports:
+            # expose Grafana over host 3000
+            - '3000:3000'
+
+
+volumes:
+  influxdb-data:
+  influxdb-config:
+  grafana:

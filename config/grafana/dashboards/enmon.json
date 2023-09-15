@@ -1,0 +1,1334 @@
+{
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": {
+          "type": "grafana",
+          "uid": "-- Grafana --"
+        },
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
+      }
+    ]
+  },
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 0,
+  "id": 1,
+  "links": [],
+  "liveNow": false,
+  "panels": [
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 0
+      },
+      "id": 5,
+      "panels": [],
+      "title": "Present data",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "c96ebc43-c822-460c-aeca-9570cd4e842e"
+      },
+      "description": "",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "left",
+            "axisSoftMin": 0,
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 20,
+            "gradientMode": "hue",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": 3600000,
+            "lineInterpolation": "smooth",
+            "lineStyle": {
+              "fill": "solid"
+            },
+            "lineWidth": 1,
+            "pointSize": 1,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": 3600000,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "watt"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Power production"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "blue",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Power consumption"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "yellow",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Battery charge"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "green",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Battery discharge"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "red",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 9,
+        "w": 16,
+        "x": 0,
+        "y": 1
+      },
+      "hideTimeOverride": false,
+      "id": 8,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "10.1.0",
+      "targets": [
+        {
+          "alias": "Power consumption",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "c96ebc43-c822-460c-aeca-9570cd4e842e"
+          },
+          "groupBy": [
+            {
+              "params": [
+                "$__interval"
+              ],
+              "type": "time"
+            },
+            {
+              "params": [
+                "null"
+              ],
+              "type": "fill"
+            }
+          ],
+          "hide": false,
+          "orderByTime": "ASC",
+          "policy": "autogen",
+          "query": "SELECT mean(\"meter_generation\") + mean(\"meter_battery\") + mean(\"meter_grid\")\nFROM \"autogen\".\"enmon\"\nWHERE \"enmon_id\"::tag =~ /^$enmon_id$/ AND $timeFilter\nGROUP BY time($__interval) fill(null)",
+          "rawQuery": true,
+          "refId": "consumption",
+          "resultFormat": "time_series",
+          "select": [
+            [
+              {
+                "params": [
+                  "value"
+                ],
+                "type": "field"
+              },
+              {
+                "params": [],
+                "type": "mean"
+              }
+            ]
+          ],
+          "tags": []
+        },
+        {
+          "alias": "Power production",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "c96ebc43-c822-460c-aeca-9570cd4e842e"
+          },
+          "groupBy": [
+            {
+              "params": [
+                "$__interval"
+              ],
+              "type": "time"
+            },
+            {
+              "params": [
+                "null"
+              ],
+              "type": "fill"
+            }
+          ],
+          "hide": false,
+          "measurement": "enmon",
+          "orderByTime": "ASC",
+          "policy": "autogen",
+          "query": "SELECT mean(\"meter_generation\") FROM \"autogen\".\"enmon\" WHERE (\"enmon_id\"::tag =~ /^$enmon_id$/) AND $timeFilter GROUP BY time($__interval) fill(null)",
+          "rawQuery": false,
+          "refId": "generation",
+          "resultFormat": "time_series",
+          "select": [
+            [
+              {
+                "params": [
+                  "meter_generation"
+                ],
+                "type": "field"
+              },
+              {
+                "params": [],
+                "type": "mean"
+              }
+            ]
+          ],
+          "tags": [
+            {
+              "key": "enmon_id::tag",
+              "operator": "=~",
+              "value": "/^$enmon_id$/"
+            }
+          ]
+        },
+        {
+          "alias": "Battery charge",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "c96ebc43-c822-460c-aeca-9570cd4e842e"
+          },
+          "groupBy": [
+            {
+              "params": [
+                "$__interval"
+              ],
+              "type": "time"
+            },
+            {
+              "params": [
+                "null"
+              ],
+              "type": "fill"
+            }
+          ],
+          "hide": false,
+          "measurement": "enmon",
+          "orderByTime": "ASC",
+          "policy": "autogen",
+          "query": "SELECT mean(\"to_battery\")\nFROM (\n    SELECT ((ABS(\"meter_battery\") - \"meter_battery\") / 2) AS \"to_battery\"\n    FROM \"autogen\".\"enmon\"\n    WHERE \"enmon_id\"::tag =~ /^$enmon_id$/ AND $timeFilter\n)\nGROUP BY time($__interval) fill(null)",
+          "rawQuery": true,
+          "refId": "to_battery",
+          "resultFormat": "time_series",
+          "select": [
+            [
+              {
+                "params": [
+                  "meter_battery"
+                ],
+                "type": "field"
+              },
+              {
+                "params": [],
+                "type": "mean"
+              }
+            ]
+          ],
+          "tags": [
+            {
+              "key": "enmon_id::tag",
+              "operator": "=~",
+              "value": "/^$enmon_id$/"
+            },
+            {
+              "condition": "AND",
+              "key": "meter_battery::field",
+              "operator": "<",
+              "value": "0"
+            }
+          ]
+        },
+        {
+          "alias": "Battery discharge",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "c96ebc43-c822-460c-aeca-9570cd4e842e"
+          },
+          "groupBy": [
+            {
+              "params": [
+                "$__interval"
+              ],
+              "type": "time"
+            },
+            {
+              "params": [
+                "null"
+              ],
+              "type": "fill"
+            }
+          ],
+          "hide": false,
+          "measurement": "enmon",
+          "orderByTime": "ASC",
+          "policy": "autogen",
+          "query": "SELECT mean(\"from_battery\")\nFROM (\n    SELECT ((ABS(\"meter_battery\") + \"meter_battery\") / 2) AS \"from_battery\"\n    FROM \"autogen\".\"enmon\"\n    WHERE \"enmon_id\"::tag =~ /^$enmon_id$/ AND $timeFilter\n)\nGROUP BY time($__interval) fill(null)",
+          "rawQuery": true,
+          "refId": "from_battery",
+          "resultFormat": "time_series",
+          "select": [
+            [
+              {
+                "params": [
+                  "meter_generation"
+                ],
+                "type": "field"
+              },
+              {
+                "params": [],
+                "type": "mean"
+              }
+            ]
+          ],
+          "tags": [
+            {
+              "key": "enmon_id::tag",
+              "operator": "=~",
+              "value": "/^$enmon_id$/"
+            },
+            {
+              "condition": "AND",
+              "key": "meter_grid",
+              "operator": "<",
+              "value": "0"
+            }
+          ]
+        }
+      ],
+      "timeFrom": "now-24h",
+      "title": "Daily energy usage",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "c96ebc43-c822-460c-aeca-9570cd4e842e"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "axisSoftMax": 100,
+            "axisSoftMin": 0,
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 30,
+            "gradientMode": "hue",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "smooth",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": true,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 6,
+        "w": 8,
+        "x": 16,
+        "y": 1
+      },
+      "hideTimeOverride": false,
+      "id": 6,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "alias": "Percentage",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "c96ebc43-c822-460c-aeca-9570cd4e842e"
+          },
+          "groupBy": [
+            {
+              "params": [
+                "$__interval"
+              ],
+              "type": "time"
+            },
+            {
+              "params": [
+                "null"
+              ],
+              "type": "fill"
+            }
+          ],
+          "measurement": "enmon",
+          "orderByTime": "ASC",
+          "policy": "autogen",
+          "refId": "A",
+          "resultFormat": "time_series",
+          "select": [
+            [
+              {
+                "params": [
+                  "percentage_battery"
+                ],
+                "type": "field"
+              },
+              {
+                "params": [],
+                "type": "mean"
+              }
+            ]
+          ],
+          "tags": [
+            {
+              "key": "enmon_id::tag",
+              "operator": "=~",
+              "value": "/^$enmon_id$/"
+            }
+          ]
+        }
+      ],
+      "timeFrom": "now-24h",
+      "title": "Battery charge",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "c96ebc43-c822-460c-aeca-9570cd4e842e"
+      },
+      "description": "",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "watt"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 3,
+        "w": 4,
+        "x": 16,
+        "y": 7
+      },
+      "hideTimeOverride": true,
+      "id": 10,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "auto"
+      },
+      "pluginVersion": "10.1.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "c96ebc43-c822-460c-aeca-9570cd4e842e"
+          },
+          "groupBy": [],
+          "hide": false,
+          "measurement": "enmon",
+          "orderByTime": "ASC",
+          "policy": "autogen",
+          "query": "SELECT LAST(\"meter_generation\") + LAST(\"meter_battery\") + LAST(\"meter_grid\")\nFROM \"autogen\".\"enmon\"\nWHERE (\"enmon_id\"::tag =~ /^$enmon_id$/) AND $timeFilter",
+          "rawQuery": true,
+          "refId": "power_consumption",
+          "resultFormat": "time_series",
+          "select": [
+            [
+              {
+                "params": [
+                  "value"
+                ],
+                "type": "field"
+              },
+              {
+                "params": [],
+                "type": "last"
+              }
+            ]
+          ],
+          "tags": [
+            {
+              "key": "enmon_id::tag",
+              "operator": "=~",
+              "value": "/^$enmon_id$/"
+            }
+          ]
+        }
+      ],
+      "timeFrom": "now-15m",
+      "title": "Current consumption",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "c96ebc43-c822-460c-aeca-9570cd4e842e"
+      },
+      "description": "",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "max": 60,
+          "min": -10,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "red",
+                "value": null
+              },
+              {
+                "color": "green",
+                "value": 10
+              },
+              {
+                "color": "red",
+                "value": 40
+              }
+            ]
+          },
+          "unit": "celsius"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 3,
+        "w": 4,
+        "x": 20,
+        "y": 7
+      },
+      "hideTimeOverride": true,
+      "id": 2,
+      "options": {
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showThresholdLabels": false,
+        "showThresholdMarkers": true
+      },
+      "pluginVersion": "10.1.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "c96ebc43-c822-460c-aeca-9570cd4e842e"
+          },
+          "groupBy": [
+            {
+              "params": [
+                "$__interval"
+              ],
+              "type": "time"
+            },
+            {
+              "params": [
+                "null"
+              ],
+              "type": "fill"
+            }
+          ],
+          "measurement": "enmon",
+          "orderByTime": "ASC",
+          "policy": "autogen",
+          "query": "SELECT last(\"temperature_battery\") FROM \"autogen\".\"enmon\" WHERE (\"enmon_id\"::tag =~ /^$enmon_id$/) AND $timeFilter GROUP BY time($__interval) fill(null)",
+          "rawQuery": true,
+          "refId": "A",
+          "resultFormat": "time_series",
+          "select": [
+            [
+              {
+                "params": [
+                  "percentage_battery"
+                ],
+                "type": "field"
+              },
+              {
+                "params": [],
+                "type": "last"
+              }
+            ]
+          ],
+          "tags": [
+            {
+              "key": "enmon_id::tag",
+              "operator": "=~",
+              "value": "/^$enmon_id$/"
+            }
+          ]
+        }
+      ],
+      "timeFrom": "now-15m",
+      "title": "Battery temperature",
+      "type": "gauge"
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 10
+      },
+      "id": 4,
+      "panels": [],
+      "title": "Historical data",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "c96ebc43-c822-460c-aeca-9570cd4e842e"
+      },
+      "description": "",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "fillOpacity": 80,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineWidth": 1,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "watth"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Grid imports"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "purple",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Total energy produced"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "blue",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Total energy consumed"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "yellow",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 9,
+        "w": 16,
+        "x": 0,
+        "y": 11
+      },
+      "id": 11,
+      "interval": "1d",
+      "maxDataPoints": 12,
+      "options": {
+        "barRadius": 0,
+        "barWidth": 0.97,
+        "fullHighlight": false,
+        "groupWidth": 0.7,
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "orientation": "auto",
+        "showValue": "auto",
+        "stacking": "none",
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        },
+        "xTickLabelRotation": -45,
+        "xTickLabelSpacing": 0
+      },
+      "targets": [
+        {
+          "alias": "Total energy consumed",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "c96ebc43-c822-460c-aeca-9570cd4e842e"
+          },
+          "groupBy": [
+            {
+              "params": [
+                "$__interval"
+              ],
+              "type": "time"
+            },
+            {
+              "params": [
+                "null"
+              ],
+              "type": "fill"
+            }
+          ],
+          "hide": false,
+          "measurement": "enmon",
+          "orderByTime": "ASC",
+          "policy": "autogen",
+          "query": "SELECT SUM(\"consumed_hour\")\nFROM (\n    SELECT \"time\", MEAN(\"meter_generation\") + MEAN(\"meter_grid\") + MEAN(\"meter_battery\") AS \"consumed_hour\"\n    FROM \"autogen\".\"enmon\"\n    WHERE (\"enmon_id\"::tag =~ /^$enmon_id$/) AND $timeFilter\n    GROUP BY TIME(1h) FILL(0)\n)\nGROUP BY TIME($__interval)",
+          "rawQuery": true,
+          "refId": "energy_consumed",
+          "resultFormat": "time_series",
+          "select": [
+            [
+              {
+                "params": [
+                  "abs(\"meter_grid\")"
+                ],
+                "type": "field"
+              }
+            ]
+          ],
+          "tags": [
+            {
+              "key": "enmon_id::tag",
+              "operator": "=~",
+              "value": "/^$enmon_id$/"
+            }
+          ]
+        },
+        {
+          "alias": "Total energy produced",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "c96ebc43-c822-460c-aeca-9570cd4e842e"
+          },
+          "groupBy": [
+            {
+              "params": [
+                "$__interval"
+              ],
+              "type": "time"
+            },
+            {
+              "params": [
+                "null"
+              ],
+              "type": "fill"
+            }
+          ],
+          "hide": false,
+          "orderByTime": "ASC",
+          "policy": "autogen",
+          "query": "SELECT SUM(\"produced_hour\")\nFROM (\n    SELECT \"time\", MEAN(\"meter_generation\") AS \"produced_hour\"\n    FROM \"autogen\".\"enmon\"\n    WHERE (\"enmon_id\"::tag =~ /^$enmon_id$/) AND $timeFilter\n    GROUP BY TIME(1h) FILL(0)\n)\nGROUP BY TIME($__interval)",
+          "rawQuery": true,
+          "refId": "energy_produced",
+          "resultFormat": "time_series",
+          "select": [
+            [
+              {
+                "params": [
+                  "value"
+                ],
+                "type": "field"
+              },
+              {
+                "params": [],
+                "type": "mean"
+              }
+            ]
+          ],
+          "tags": []
+        },
+        {
+          "alias": "Grid imports",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "c96ebc43-c822-460c-aeca-9570cd4e842e"
+          },
+          "groupBy": [
+            {
+              "params": [
+                "$__interval"
+              ],
+              "type": "time"
+            },
+            {
+              "params": [
+                "null"
+              ],
+              "type": "fill"
+            }
+          ],
+          "hide": false,
+          "orderByTime": "ASC",
+          "policy": "autogen",
+          "query": "\nSELECT SUM(\"imported_hour\")\nFROM (\n    SELECT \"time\", MEAN(\"meter_grid\") AS \"imported_hour\"\n    FROM \"autogen\".\"enmon\"\n    WHERE (\"enmon_id\"::tag =~ /^$enmon_id$/) AND \"meter_grid\" > 0 AND $timeFilter\n    GROUP BY TIME(1h) FILL(0)\n)\nGROUP BY TIME($__interval)",
+          "rawQuery": true,
+          "refId": "A",
+          "resultFormat": "time_series",
+          "select": [
+            [
+              {
+                "params": [
+                  "value"
+                ],
+                "type": "field"
+              },
+              {
+                "params": [],
+                "type": "mean"
+              }
+            ]
+          ],
+          "tags": []
+        }
+      ],
+      "title": "Energy usage",
+      "type": "barchart"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "c96ebc43-c822-460c-aeca-9570cd4e842e"
+      },
+      "description": "",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            }
+          },
+          "mappings": [],
+          "unit": "watth"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Total energy produced"
+            },
+            "properties": [
+              {
+                "id": "custom.hideFrom",
+                "value": {
+                  "legend": false,
+                  "tooltip": true,
+                  "viz": true
+                }
+              },
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "blue",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Charged"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "semi-dark-green",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Self consumption"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "semi-dark-yellow",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Exported to grid"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "semi-dark-orange",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 9,
+        "w": 8,
+        "x": 16,
+        "y": 11
+      },
+      "id": 3,
+      "options": {
+        "displayLabels": [
+          "value"
+        ],
+        "legend": {
+          "displayMode": "table",
+          "placement": "right",
+          "showLegend": true,
+          "values": [
+            "value"
+          ]
+        },
+        "pieType": "donut",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "alias": "Exported to grid",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "c96ebc43-c822-460c-aeca-9570cd4e842e"
+          },
+          "groupBy": [
+            {
+              "params": [
+                "$__interval"
+              ],
+              "type": "time"
+            },
+            {
+              "params": [
+                "null"
+              ],
+              "type": "fill"
+            }
+          ],
+          "hide": false,
+          "measurement": "enmon",
+          "orderByTime": "ASC",
+          "policy": "autogen",
+          "query": "SELECT SUM(\"to_grid_hour\")\nFROM (\n    SELECT MEAN(\"to_grid\") AS \"to_grid_hour\"\n    FROM (\n        SELECT ((ABS(\"meter_grid\") - \"meter_grid\") / 2) AS \"to_grid\"\n        FROM \"autogen\".\"enmon\"\n        WHERE (\"enmon_id\"::tag =~ /^$enmon_id$/) AND $timeFilter\n    )\n    GROUP BY TIME(1h) FILL(0)\n)",
+          "rawQuery": true,
+          "refId": "energy_to_grid",
+          "resultFormat": "time_series",
+          "select": [
+            [
+              {
+                "params": [
+                  "abs(\"meter_grid\")"
+                ],
+                "type": "field"
+              }
+            ]
+          ],
+          "tags": [
+            {
+              "key": "enmon_id::tag",
+              "operator": "=~",
+              "value": "/^$enmon_id$/"
+            }
+          ]
+        },
+        {
+          "alias": "Charged",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "c96ebc43-c822-460c-aeca-9570cd4e842e"
+          },
+          "groupBy": [
+            {
+              "params": [
+                "$__interval"
+              ],
+              "type": "time"
+            },
+            {
+              "params": [
+                "null"
+              ],
+              "type": "fill"
+            }
+          ],
+          "hide": false,
+          "orderByTime": "ASC",
+          "policy": "autogen",
+          "query": "SELECT SUM(\"to_battery_hour\")\nFROM (\n    SELECT MEAN(\"to_battery\") AS \"to_battery_hour\"\n    FROM (\n        SELECT ((ABS(\"meter_battery\") - \"meter_battery\") / 2) AS \"to_battery\"\n        FROM \"autogen\".\"enmon\"\n        WHERE (\"enmon_id\"::tag =~ /^$enmon_id$/) AND $timeFilter\n    )\n    GROUP BY TIME(1h) FILL(0)\n)",
+          "rawQuery": true,
+          "refId": "energy_to_battery",
+          "resultFormat": "time_series",
+          "select": [
+            [
+              {
+                "params": [
+                  "value"
+                ],
+                "type": "field"
+              },
+              {
+                "params": [],
+                "type": "mean"
+              }
+            ]
+          ],
+          "tags": []
+        },
+        {
+          "alias": "Total energy produced",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "c96ebc43-c822-460c-aeca-9570cd4e842e"
+          },
+          "groupBy": [
+            {
+              "params": [
+                "$__interval"
+              ],
+              "type": "time"
+            },
+            {
+              "params": [
+                "null"
+              ],
+              "type": "fill"
+            }
+          ],
+          "hide": false,
+          "orderByTime": "ASC",
+          "policy": "autogen",
+          "query": "SELECT SUM(\"produced_hour\")\nFROM (\n    SELECT MEAN(\"meter_generation\") AS \"produced_hour\"\n    FROM \"autogen\".\"enmon\"\n    WHERE (\"enmon_id\"::tag =~ /^$enmon_id$/) AND $timeFilter\n    GROUP BY TIME(1h) FILL(0)\n)",
+          "rawQuery": true,
+          "refId": "energy_produced",
+          "resultFormat": "time_series",
+          "select": [
+            [
+              {
+                "params": [
+                  "value"
+                ],
+                "type": "field"
+              },
+              {
+                "params": [],
+                "type": "mean"
+              }
+            ]
+          ],
+          "tags": []
+        },
+        {
+          "datasource": {
+            "name": "Expression",
+            "type": "__expr__",
+            "uid": "__expr__"
+          },
+          "expression": "$energy_produced - $energy_to_battery - $energy_to_grid",
+          "hide": false,
+          "refId": "Self consumption",
+          "type": "math"
+        }
+      ],
+      "title": "Generated energy utilization",
+      "type": "piechart"
+    }
+  ],
+  "refresh": "",
+  "schemaVersion": 38,
+  "style": "dark",
+  "tags": [],
+  "templating": {
+    "list": [
+      {
+        "current": {
+          "selected": false,
+          "text": "plant0",
+          "value": "plant0"
+        },
+        "datasource": {
+          "type": "influxdb",
+          "uid": "c96ebc43-c822-460c-aeca-9570cd4e842e"
+        },
+        "definition": "SHOW TAG VALUES ON \"enmon\" WITH KEY = \"enmon_id\"",
+        "description": "Choose which plant data should be visualized",
+        "hide": 0,
+        "includeAll": false,
+        "label": "Plant",
+        "multi": false,
+        "name": "enmon_id",
+        "options": [],
+        "query": "SHOW TAG VALUES ON \"enmon\" WITH KEY = \"enmon_id\"",
+        "refresh": 1,
+        "regex": "",
+        "skipUrlSync": false,
+        "sort": 0,
+        "type": "query"
+      }
+    ]
+  },
+  "time": {
+    "from": "now/fy",
+    "to": "now/fy"
+  },
+  "timepicker": {
+    "refresh_intervals": [
+      "30s",
+      "1m",
+      "5m",
+      "15m",
+      "30m",
+      "1h",
+      "2h",
+      "1d"
+    ]
+  },
+  "timezone": "",
+  "title": "enmon",
+  "uid": "a1cb4c68-bc9f-4907-a575-5e61b46f5e65",
+  "version": 2,
+  "weekStart": ""
+} 

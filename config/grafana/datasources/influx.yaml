@@ -1,0 +1,17 @@
+apiVersion: 1
+
+datasources:
+  - name: influx
+    type: influxdb
+    access: proxy
+    url: http://influxdb:8086
+    uid: c96ebc43-c822-460c-aeca-9570cd4e842e
+    jsonData:
+      dbName: enmon
+      httpMode: GET
+      httpHeaderName1: 'Authorization'
+    secureJsonData:
+      httpHeaderValue1: 'Token ${INFLUXDB_TOKEN}'
+    version: 1
+    editable: false
+    isDefault: true
